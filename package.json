@@ -1,0 +1,72 @@
+{
+  "name": "typescript-template",
+  "version": "1.0.4",
+  "description": "A complete Node.js project template using TypeScript and following general best practices.",
+  "keywords": [
+    "typescript",
+    "template"
+  ],
+  "author": {
+    "name": "Lucas Ancelmo"
+  },
+  "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/"
+  ],
+  "scripts": {
+    "build": "npm run clean && npm run lint && tsc",
+    "changelog": "conventional-changelog -p angular -u",
+    "changelog:update": "conventional-changelog -p angular -i CHANGELOG.md -s && git add CHANGELOG.md",
+    "clean": "(rm -r ./.nyc_output || true) && (rm -r ./coverage || true) && (rm -r ./dist || true)",
+    "clean:all": "npm run clean && (rm -r ./node_modules || true)",
+    "cover": "nyc npm run test",
+    "cover:check": "nyc --check-coverage npm run test",
+    "coveralls": "nyc report --reporter=text-lcov | coveralls",
+    "lint": "eslint --ext .ts --fix src/**/*.ts test/**/*.ts",
+    "preversion": "npm run build && npm run cover:check",
+    "postversion": "git push && git push --tags",
+    "prepare": "npm run build",
+    "test": "mocha",
+    "upgrade": "npx npm-check -u",
+    "version": "npm run build && npm run changelog:update",
+    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\""
+  },
+  "devDependencies": {
+    "@types/chai": "^4.1.6",
+    "@types/express": "^4.17.13",
+    "@types/mocha": "^9.0.0",
+    "@types/multer": "^1.4.7",
+    "@types/node": "^16.11.41",
+    "@typescript-eslint/eslint-plugin": "^5.3.0",
+    "@typescript-eslint/parser": "^5.3.0",
+    "chai": "^4.1.2",
+    "concurrently": "^7.2.2",
+    "conventional-changelog-cli": "^2.0.12",
+    "coveralls": "^3.0.3",
+    "cz-conventional-changelog": "^3.0.2",
+    "eslint": "^8.2.0",
+    "mocha": "^10.0.0",
+    "nodemon": "^2.0.16",
+    "nyc": "^15.0.0",
+    "source-map-support": "^0.5.12",
+    "ts-node": "^10.0.0",
+    "typescript": "^4.7.4"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "dependencies": {
+    "axios": "^0.27.2",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "multer": "^1.4.5-lts.1",
+    "sitka": "^1.0.5"
+  }
+}
