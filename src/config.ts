@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { IToken } from './MAL';
 const path = './src/config.json'
-const savedConfig = JSON.parse(fs.readFileSync(path, 'utf8'));
+const savedConfig : IToken = JSON.parse(fs.readFileSync(path, 'utf8'));
 
 function saveConfig(data : IToken){
 
@@ -9,7 +9,7 @@ function saveConfig(data : IToken){
 }
 export  {savedConfig, saveConfig, isTokenExpired};
 
-function isTokenExpired(){
+function isTokenExpired(): boolean{
 
 	const savedDate = new Date (savedConfig.requestDate)
 	const expires = parseInt(savedConfig.expires_in, 10)

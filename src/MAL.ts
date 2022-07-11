@@ -46,24 +46,34 @@ export class MAL {
 		
 	}
 
-	searchAnime(name : string){
+	searchAnime(query : Query){
 
 		if(this.isTokenExpired()){
 			this.refreshToken();
 		}
-		const url = `${process.env.MAL_BASE_URL}${'/anime?q='}${name}&limit=1`;
+		const url = `${process.env.MAL_BASE_URL}${'/anime?q='}${query.build()}`;
 
 		return axios.get(url, {headers: {'Authorization': `Bearer ${savedConfig.access_token}`}});
 	}
 
-	async updateAnimeStatus(id : number, status : string, num_watched_episodes = '0' ){
+	updateAnimeStatus(id : number, status : string, num_watched_episodes = 0 ){
 
 		if(this.isTokenExpired()){
 			this.refreshToken();
 		}
 		const url = `${process.env.MAL_BASE_URL}${'/anime/'}${id}${'/my_list_status'}`;
-		const data = new URLSearchParams({status: status, num_watched_episodes: num_watched_episodes})
+		const data = new URLSearchParams({status: status, num_watched_episodes: num_watched_episodes.toString()})
 		return axios.put(url, data , {headers: {'Authorization': `Bearer ${savedConfig.access_token}`}});
+	}
+
+	getAnimeListByStatus(lists : string){
+		if(this.isTokenExpired()){
+			this.refreshToken();
+		}
+		const status = { status : lists };
+		const statusParam = new URLSearchParams(status);
+		const url = `${process.env.MAL_BASE_URL}${'/users/@me/animelist?fields=list_status'}&${statusParam.toString()}&limit=1000`;
+		return axios.get(url, {headers: {'Authorization': `Bearer ${savedConfig.access_token}`}});
 	}
 
 	isTokenExpired() : boolean {
@@ -77,5 +87,28 @@ export interface IToken{
 	refresh_token : string;
 	token_type : string;
 	requestDate : Date;
+}
+
+export class Query{
+	q: string;
+	limit: string;
+	offset?: string;
+	fields?: string;
+	constructor(public qparam: string, public limitparam = '1', public fieldsparam?: string, public offsetparam = '0'){
+		this.q = qparam;
+		this.limit = limitparam;
+		this.offset = offsetparam;
+		this.fields = fieldsparam;
+	}
+
+	build(){
+		let q = {q: this.q.substring(0,64), limit: this.limit};
+
+		if(this.fields){
+			q = {...q, fields: this.fields} as Query;
+		}
+		
+		return new URLSearchParams(q)
+	}
 }
 
