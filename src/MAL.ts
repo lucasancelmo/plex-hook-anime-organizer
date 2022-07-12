@@ -112,3 +112,41 @@ export class Query{
 	}
 }
 
+export interface Node{
+	id:number;
+	title:string;
+	main_picture:{
+		medium: string;
+		large: string;
+	}
+
+}
+
+export interface ListStatus{
+	status: Status;
+	score: number;
+	num_watched_episodes: number;
+	is_rewatching: boolean;
+	updated_at: Date;
+}
+
+export enum Status{
+	WATCHING = 'watching',
+	COMPLETED = 'completed',
+	ON_HOLD = 'on_hold',
+	DROPPED = 'dropped',
+	PLAN_TO_WATCH = 'plan_to_watch'
+}
+
+export interface Anime{
+	node: Node;
+	list_status: ListStatus;
+}
+
+export interface MALResponse{
+	data: Anime[];
+	paging: {
+		next:string;
+	}
+}
+

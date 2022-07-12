@@ -1,6 +1,6 @@
 export interface Plex{
     event: Media | Library;
-    metadata: Metadata;
+    Metadata: Metadata;
 }
 
 export interface Metadata{
@@ -10,7 +10,7 @@ export interface Metadata{
 }
 
 export enum Media{
-    START = 'media.start', //"media.play"
+    START = 'media.play', //"media.play"
     STOP = 'media.stop',
 }
 

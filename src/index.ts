@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import multer from 'multer';
 
 
-import {IToken, MAL, Query} from './MAL';
+import {IToken, MAL, Query, Anime, MALResponse, Status} from './MAL';
 import { Plex, Media, Library } from './Plex';
 
 
@@ -23,7 +23,7 @@ app.post('/event',upload.single('thumb'), async (req: Request, res: Response) =>
 	
 	if(payload.event === Media.START){
 		
-		await handleStart(payload);
+		await handlePlay(payload);
 
 	}
 
@@ -86,8 +86,9 @@ async function handleStop(payload: Plex) {
 	console.log('stop', payload);
 	try {
 		const resp = await api.getAnimeListByStatus('');
-		const plan = resp.data.data.filter((item: { list_status: any; }) => {
-			return (item.list_status.status === 'plan_to_watch' || item.list_status.status === 'watching');
+		const malresp : MALResponse = resp.data;
+		const plan : Anime[] = malresp.data.filter((item: Anime) => {
+			return (item.list_status.status === Status.PLAN_TO_WATCH || item.list_status.status === Status.WATCHING);
 		});
 		console.log(plan);
 
@@ -100,8 +101,8 @@ async function handleNew(payload:Plex) {
 	console.log(payload);
 	try {
 		const resp = await api.getAnimeListByStatus('');
-		const plan = resp.data.data.filter((item: { list_status: any; }) => {
-			return (item.list_status.status === 'plan_to_watch' || item.list_status.status === 'watching');
+		const plan = resp.data.data.filter((item: Anime) => {
+			return (item.list_status.status === Status.PLAN_TO_WATCH || item.list_status.status === Status.WATCHING);
 		});
 		console.log(plan);
 
@@ -110,8 +111,9 @@ async function handleNew(payload:Plex) {
 	}
 }
 
-async function handleStart(payload: Plex) {
-	const name: string = payload.metadata.grandparentTitle.includes(':') ? payload.metadata.grandparentTitle.split(':')[0].trim() : payload.metadata.grandparentTitle;
+async function handlePlay(payload: Plex) {
+	console.log(payload)
+	const name: string = payload.Metadata.grandparentTitle.includes(':') ? payload.Metadata.grandparentTitle.split(':')[0].trim() : payload.Metadata.grandparentTitle;
 	console.log({ name });
 	try {
 		const response = await api.searchAnime(new Query(name));
@@ -126,8 +128,8 @@ async function handleStart(payload: Plex) {
 		console.log(response.data.data[0].node);
 
 
-		if (name === title || title.includes(name)) {
-			const animeStatus = await api.updateAnimeStatus(id, 'watching', payload.metadata.index);
+		if (name === title || title.includes(name) || title.includes(name.split(' ')[0])) {
+			const animeStatus = await api.updateAnimeStatus(id, Status.WATCHING, payload.Metadata.index);
 			console.log(animeStatus.data);
 		}
 
