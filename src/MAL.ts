@@ -122,6 +122,18 @@ export interface Node{
 
 }
 
+export function findAnime(animes: Anime[],  name: string): Anime | undefined {
+	//console.log(nodes)
+	const anime = animes.find((anime: Anime) => {
+		console.log(typeof anime.node.title)
+		return (anime.node.title === name || anime.node.title.includes(name) || anime.node.title.includes(name.split(' ')[0]));
+	});
+	if(anime){
+		return anime
+	}
+	return undefined;
+}
+
 export interface ListStatus{
 	status: Status;
 	score: number;

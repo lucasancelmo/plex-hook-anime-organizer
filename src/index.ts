@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import multer from 'multer';
 
 
-import {IToken, MAL, Query, Anime, MALResponse, Status} from './MAL';
+import {IToken, MAL, Query, Anime, findAnime, Status, Node} from './MAL';
 import { Plex, Media, Library } from './Plex';
 
 
@@ -24,12 +24,6 @@ app.post('/event',upload.single('thumb'), async (req: Request, res: Response) =>
 	if(payload.event === Media.START){
 		
 		await handlePlay(payload);
-
-	}
-
-	if(payload.event === Media.STOP){
-
-		await handleStop(payload);
 
 	}
 	
@@ -81,60 +75,54 @@ app.get('/search', async (req: Request, res: Response) => {
 	
 })
 
-
-async function handleStop(payload: Plex) {
-	console.log('stop', payload);
-	try {
-		const resp = await api.getAnimeListByStatus('');
-		const malresp : MALResponse = resp.data;
-		const plan : Anime[] = malresp.data.filter((item: Anime) => {
-			return (item.list_status.status === Status.PLAN_TO_WATCH || item.list_status.status === Status.WATCHING);
-		});
-		console.log(plan);
-
-	} catch (e) {
-		console.log(e);
-	}
-}
-
 async function handleNew(payload:Plex) {
-	console.log(payload);
+	const name: string = payload.Metadata.grandparentTitle.replace(/[^\w\s]/gi, '')
+
+	console.log({name})
 	try {
 		const resp = await api.getAnimeListByStatus('');
 		const plan = resp.data.data.filter((item: Anime) => {
 			return (item.list_status.status === Status.PLAN_TO_WATCH || item.list_status.status === Status.WATCHING);
 		});
-		console.log(plan);
+		const anime = findAnime(plan, name);
+
+		if(!anime){
+			const response = await api.searchAnime(new Query(name, '10'));
+
+			const result = findAnime(response.data.data, name);
+
+
+			if(result){
+				const animeStatus = await api.updateAnimeStatus(result.node.id, Status.PLAN_TO_WATCH, payload.Metadata.index);
+				console.log('handleNew data', animeStatus.data);
+			}
+		}
 
 	} catch (e) {
-		console.log(e);
+		console.log('handleNew error', e);
 	}
 }
 
 async function handlePlay(payload: Plex) {
-	console.log(payload)
-	const name: string = payload.Metadata.grandparentTitle.includes(':') ? payload.Metadata.grandparentTitle.split(':')[0].trim() : payload.Metadata.grandparentTitle;
+
+	const name: string = payload.Metadata.grandparentTitle.replace(/[^\w\s]/gi, '')
 	console.log({ name });
 	try {
-		const response = await api.searchAnime(new Query(name));
+		const response = await api.searchAnime(new Query(name, '10'));
 
-		if (response.status !== 200) {
-			console.log(response.status);
-			console.log(response.data.data);
-			//res.status(response.status).send('Error');
-		}
-
-		const { id, title } = response.data.data[0].node;
+		const result = findAnime(response.data.data, name);
+		
+		const { id, title } = result?.node || { id: -1, title: '' };
 		console.log(response.data.data[0].node);
 
 
 		if (name === title || title.includes(name) || title.includes(name.split(' ')[0])) {
 			const animeStatus = await api.updateAnimeStatus(id, Status.WATCHING, payload.Metadata.index);
-			console.log(animeStatus.data);
+			console.log('handlePlay data', animeStatus.data);
 		}
 
 	} catch (e) {
-		console.log(e);
+		console.log('handlePlay error', e);
 	}
 }
 
