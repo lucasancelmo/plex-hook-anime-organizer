@@ -1,7 +1,13 @@
 import fs from 'fs';
 import { IToken } from './MAL';
-const path = './src/config.json'
-const savedConfig : IToken = JSON.parse(fs.readFileSync(path, 'utf8'));
+const path = './src/config.json';
+let file = '{}';
+if(fs.existsSync(path)){
+
+	file = fs.readFileSync(path, 'utf8');
+}
+
+const savedConfig : IToken = JSON.parse(file);
 
 function saveConfig(data : IToken){
 

@@ -81,13 +81,6 @@ export class MAL {
 	}
 }
 
-export interface IToken{
-	access_token : string;
-	expires_in : string;
-	refresh_token : string;
-	token_type : string;
-	requestDate : Date;
-}
 
 export class Query{
 	q: string;
@@ -103,7 +96,7 @@ export class Query{
 
 	build(){
 		let q = {q: this.q.substring(0,64), limit: this.limit};
-
+		
 		if(this.fields){
 			q = {...q, fields: this.fields} as Query;
 		}
@@ -112,24 +105,15 @@ export class Query{
 	}
 }
 
-export interface Node{
-	id:number;
-	title:string;
-	main_picture:{
-		medium: string;
-		large: string;
-	}
-
-}
 
 export function findAnime(animes: Anime[],  name: string): Anime | undefined {
 	//console.log(nodes)
-	const anime = animes.find((anime: Anime) => {
+	const animeFound = animes.find((anime: Anime) => {
 		console.log(typeof anime.node.title)
 		return (anime.node.title === name || anime.node.title.includes(name) || anime.node.title.includes(name.split(' ')[0]));
 	});
-	if(anime){
-		return anime
+	if(animeFound){
+		return animeFound
 	}
 	return undefined;
 }
@@ -162,3 +146,20 @@ export interface MALResponse{
 	}
 }
 
+
+export interface IToken{
+	access_token : string;
+	expires_in : string;
+	refresh_token : string;
+	token_type : string;
+	requestDate : Date;
+}
+export interface Node{
+	id:number;
+	title:string;
+	main_picture:{
+		medium: string;
+		large: string;
+	}
+	
+}

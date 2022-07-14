@@ -1,9 +1,7 @@
 import express, {Express, Request, Response} from 'express';
 import dotenv from 'dotenv';
 import multer from 'multer';
-
-
-import {IToken, MAL, Query, Anime, findAnime, Status, Node} from './MAL';
+import {IToken, MAL, Query, Anime, findAnime, Status} from './MAL';
 import { Plex, Media, Library } from './Plex';
 
 
@@ -28,7 +26,7 @@ app.post('/event',upload.single('thumb'), async (req: Request, res: Response) =>
 	}
 	
 	if(payload.event === Library.NEW){
-		//add to plan to watch only if it is not already in the plan to watch or in watching or on hold list
+		
 		await handleNew(payload);
 	}
 	res.send('ok');
@@ -51,7 +49,6 @@ app.get('/oauth', async (req: Request, res: Response) => {
 
 app.get('/refresh', async (_req: Request, res: Response) => {
 	
-
 	await api.refreshToken();
 	res.send('ok');
 	
@@ -63,10 +60,9 @@ app.get('/search', async (req: Request, res: Response) => {
 	const name = req.query.q?.toString() || '';
 	const limit = req.query.limit?.toString() || '5';
 	const fields = req.query.fields?.toString() || 'title,id';
-	console.log(name)
-	console.log(req.query)
+
 	api.searchAnime(new Query(name, limit, fields)).then(data => {
-		//console.log(data)
+		
 		res.send(data.data);
 	}).catch(err => {
 		res.send(err);
