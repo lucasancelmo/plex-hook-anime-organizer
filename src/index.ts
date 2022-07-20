@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import multer from 'multer';
 import {IToken, MAL, Query, Anime, findAnime, Status} from './MAL';
 import { Plex, Media, Library } from './Plex';
-
+import { Anilist } from './Anilist';
 
 dotenv.config();
 const upload = multer({dest: '/temp/'});
@@ -14,21 +14,21 @@ app.listen(port, () =>{
 	console.log(`Server is running on port ${port}`);
 })
 const api = new MAL();
-
+const anilist = new Anilist();
 app.post('/event',upload.single('thumb'), async (req: Request, res: Response) => {
 	const payload : Plex = JSON.parse(req.body.payload);
-	
-	
-	if(payload.event === Media.START){
+	if(payload.Metadata.librarySectionTitle === 'Animes'){
 		
-		await handlePlay(payload);
+		if(payload.event === Media.START){
+			console.log(payload)
+			await handlePlay(payload);
+		}
+		
+		if(payload.event === Library.NEW){
+			await handleNew(payload);
+		}
+	}
 
-	}
-	
-	if(payload.event === Library.NEW){
-		
-		await handleNew(payload);
-	}
 	res.send('ok');
 });
 
@@ -61,12 +61,18 @@ app.get('/search', async (req: Request, res: Response) => {
 	const limit = req.query.limit?.toString() || '5';
 	const fields = req.query.fields?.toString() || 'title,id';
 
-	api.searchAnime(new Query(name, limit, fields)).then(data => {
+	anilist.searchAnime(name).then(data => {
 		
 		res.send(data.data);
 	}).catch(err => {
 		res.send(err);
 	})
+	// api.searchAnime(new Query(name, limit, fields)).then(data => {
+		
+	// 	res.send(data.data);
+	// }).catch(err => {
+	// 	res.send(err);
+	// })
 
 	
 })
@@ -101,19 +107,27 @@ async function handleNew(payload:Plex) {
 
 async function handlePlay(payload: Plex) {
 
-	const name: string = payload.Metadata.grandparentTitle.replace(/[^\w\s]/gi, '')
+	const name: string = payload.Metadata.grandparentTitle.replace(/[^\w\s]/gi, '').substring(0, 64).toLowerCase();
 	console.log({ name });
 	try {
-		const response = await api.searchAnime(new Query(name, '10'));
+		const response = await anilist.searchAnime(name);
+		//const response = await api.searchAnime(new Query(name, '10'));
+		const media = response.data.data.Media;
 
-		const result = findAnime(response.data.data, name);
-		
-		const { id, title } = result?.node || { id: -1, title: '' };
-		console.log(response.data.data[0].node);
+		//const result = findAnime(response.data.data, name);
+		console.log(media)
+		//const { id, title } = result?.node || { id: -1, title: '' };
+		const { idMal, title } = media
+		//console.log(result);
 
-
-		if (name === title || title.includes(name) || title.includes(name.split(' ')[0])) {
-			const animeStatus = await api.updateAnimeStatus(id, Status.WATCHING, payload.Metadata.index);
+		console.log(name.split(' ')[0])
+		if (name.toLowerCase() === title?.romaji?.toLowerCase() || 
+				title?.romaji?.toLowerCase().includes(name) || 
+				title?.romaji?.toLowerCase().includes(name.split(' ')[0]) || 
+				name.toLowerCase() === title?.english?.toLowerCase() || 
+				title?.english?.toLowerCase().includes(name) || 
+				title?.english?.toLowerCase().includes(name.split(' ')[0])) {
+			const animeStatus = await api.updateAnimeStatus(idMal, Status.WATCHING, payload.Metadata.index);
 			console.log('handlePlay data', animeStatus.data);
 		}
 

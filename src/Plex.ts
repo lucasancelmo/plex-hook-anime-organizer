@@ -7,6 +7,8 @@ export interface Metadata{
     title: string;
     grandparentTitle: string;
     index: number;
+    librarySectionType: string;
+    librarySectionTitle: string;
 }
 
 export enum Media{

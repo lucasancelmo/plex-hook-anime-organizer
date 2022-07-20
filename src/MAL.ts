@@ -51,7 +51,7 @@ export class MAL {
 		if(this.isTokenExpired()){
 			this.refreshToken();
 		}
-		const url = `${process.env.MAL_BASE_URL}${'/anime?q='}${query.build()}`;
+		const url = `${process.env.MAL_BASE_URL}${'/anime?'}${query.build()}`;
 
 		return axios.get(url, {headers: {'Authorization': `Bearer ${savedConfig.access_token}`}});
 	}
@@ -107,12 +107,18 @@ export class Query{
 
 
 export function findAnime(animes: Anime[],  name: string): Anime | undefined {
-	//console.log(nodes)
+	//console.log(animes)
+	
 	const animeFound = animes.find((anime: Anime) => {
 		console.log(typeof anime.node.title)
-		return (anime.node.title === name || anime.node.title.includes(name) || anime.node.title.includes(name.split(' ')[0]));
+		//|| anime.node.title.includes(name.split(' ')[0])
+		const animeTitle = anime.node.title.replace(/[^\w\s]/gi, '')
+		console.log('name', name)
+		console.log(animeTitle)
+		return (animeTitle === name || animeTitle.includes(name));
 	});
 	if(animeFound){
+		animeFound.node.title = animeFound.node.title.replace(/[^\w\s]/gi, '');
 		return animeFound
 	}
 	return undefined;
