@@ -1,10 +1,12 @@
 {
-  "name": "typescript-template",
-  "version": "1.0.4",
+  "name": "plex-hook-anime-organizer",
+  "version": "0.0.1",
   "description": "Automation for updating Animelist using Plexhooks.",
   "keywords": [
     "typescript",
-    "template"
+    "plex",
+    "animelist",
+    "plexhooks"
   ],
   "author": {
     "name": "Lucas Ancelmo"
