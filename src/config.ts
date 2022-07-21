@@ -8,7 +8,10 @@ if(fs.existsSync(path)){
 }
 
 const savedConfig = () => {
-	file = fs.readFileSync(path, 'utf8');
+	if(fs.existsSync(path)){
+
+		file = fs.readFileSync(path, 'utf8');
+	}
 	console.log(file)
 	return JSON.parse(file);
 };
