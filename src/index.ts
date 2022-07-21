@@ -58,8 +58,8 @@ app.get('/refresh', async (_req: Request, res: Response) => {
 app.get('/search', async (req: Request, res: Response) => {
 	
 	const name = req.query.q?.toString() || '';
-	const limit = req.query.limit?.toString() || '5';
-	const fields = req.query.fields?.toString() || 'title,id';
+	/*const limit = req.query.limit?.toString() || '5';
+	const fields = req.query.fields?.toString() || 'title,id';*/
 
 	anilist.searchAnime(name).then(data => {
 		
