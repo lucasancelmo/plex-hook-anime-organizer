@@ -62,9 +62,10 @@ export class MAL {
 		if(this.isTokenExpired()){
 			this.refreshToken();
 		}
-		console.log(this.config)
+		console.log('config ', this.config)
 		
 		const conf = savedConfig();
+		console.log('conf ', conf);
 		const url = `${process.env.MAL_BASE_URL}${'/anime/'}${id}${'/my_list_status'}`;
 		const data = new URLSearchParams({status: status, num_watched_episodes: num_watched_episodes.toString()})
 		return axios.put(url, data , {headers: {'Authorization': `Bearer ${conf.access_token}`}});
