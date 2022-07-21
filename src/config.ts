@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { IToken } from './MAL';
-const path = './src/config.json';
+const path = 'config.json';
 let file = '{}';
 if(fs.existsSync(path)){
 
