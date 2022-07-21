@@ -7,7 +7,11 @@ if(fs.existsSync(path)){
 	file = fs.readFileSync(path, 'utf8');
 }
 
-const savedConfig = () => JSON.parse(file);
+const savedConfig = () => {
+	file = fs.readFileSync(path, 'utf8');
+	console.log(file)
+	return JSON.parse(file);
+};
 
 function saveConfig(data : IToken){
 
