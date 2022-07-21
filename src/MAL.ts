@@ -63,7 +63,7 @@ export class MAL {
 			this.refreshToken();
 		}
 		console.log(this.config)
-		console.log(config)
+		
 		const conf = savedConfig();
 		const url = `${process.env.MAL_BASE_URL}${'/anime/'}${id}${'/my_list_status'}`;
 		const data = new URLSearchParams({status: status, num_watched_episodes: num_watched_episodes.toString()})
