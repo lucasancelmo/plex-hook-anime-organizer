@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { isTokenExpired, saveConfig, savedConfig } from './config';
-const config = savedConfig();
+
 export class MAL {
-	
+	config = savedConfig();
 	generateAuthorizeURL() : string {
 		let url = `${process.env.MAL_API_URL}${'/authorize?'}`;
 

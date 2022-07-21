@@ -16,8 +16,8 @@ function saveConfig(data : IToken){
 export  {savedConfig, saveConfig, isTokenExpired};
 
 function isTokenExpired(): boolean{
-
-	const savedDate = new Date (savedConfig.requestDate)
-	const expires = parseInt(savedConfig.expires_in, 10)
+	const conf = savedConfig();
+	const savedDate = new Date (conf.requestDate)
+	const expires = parseInt(conf.expires_in, 10)
 	return new Date().getTime() > savedDate.getTime()  + expires * 1000;
 }
