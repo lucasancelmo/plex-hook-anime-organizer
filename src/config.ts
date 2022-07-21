@@ -7,9 +7,8 @@ if(fs.existsSync(path)){
 	file = fs.readFileSync(path, 'utf8');
 }
 
-const savedConfig : IToken = JSON.parse(file);
-console.log({file})
-console.log({savedConfig})
+const savedConfig : IToken = () => JSON.parse(file);
+
 function saveConfig(data : IToken){
 
 	fs.writeFileSync(path, JSON.stringify(data, null, 2));
